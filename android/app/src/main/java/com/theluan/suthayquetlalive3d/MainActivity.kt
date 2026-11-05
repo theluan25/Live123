@@ -1,3 +1,4 @@
+
 package com.theluan.suthayquetlalive3d
 
 import android.os.Bundle
@@ -14,15 +15,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
 import io.github.sceneview.Scene
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Size
-import io.github.sceneview.node.CameraNode
 import io.github.sceneview.node.CubeNode
 import io.github.sceneview.node.SphereNode
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberNode
+import io.github.sceneview.rememberMaterialLoader
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,68 +40,75 @@ fun LiveApp() {
     var isLive by remember { mutableStateOf(false) }
     var likes by remember { mutableIntStateOf(0) }
     var gifts by remember { mutableIntStateOf(0) }
-    var message by remember { mutableStateOf("Chào mừng đến với sân chùa!") }
+    var message by remember {
+        mutableStateOf("Chào mừng đến với sân chùa!")
+    }
 
     val engine = rememberEngine()
-val materialLoader = io.github.sceneview.rememberMaterialLoader(engine)
+    val materialLoader = rememberMaterialLoader(engine)
 
-val floorMaterial = remember(engine) {
-    materialLoader.createColorInstance(Color(0xFF78916A))
-}
-val templeMaterial = remember(engine) {
-    materialLoader.createColorInstance(Color(0xFFB77A42))
-}
-val roofMaterial = remember(engine) {
-    materialLoader.createColorInstance(Color(0xFF713B28))
-}
-val gateMaterial = remember(engine) {
-    materialLoader.createColorInstance(Color(0xFF8B4D2D))
-}
-val gateTopMaterial = remember(engine) {
-    materialLoader.createColorInstance(Color(0xFFB98A42))
-}
-val monkMaterial = remember(engine) {
-    materialLoader.createColorInstance(Color(0xFFE0A13D))
-}
-val headMaterial = remember(engine) {
-    materialLoader.createColorInstance(Color(0xFFE7B98B))
-}
+    // VẬT LIỆU 3D
+    val floorMaterial = remember(engine) {
+        materialLoader.createColorInstance(Color(0xFF78916A))
+    }
+    val templeMaterial = remember(engine) {
+        materialLoader.createColorInstance(Color(0xFFB77A42))
+    }
+    val roofMaterial = remember(engine) {
+        materialLoader.createColorInstance(Color(0xFF713B28))
+    }
+    val gateMaterial = remember(engine) {
+        materialLoader.createColorInstance(Color(0xFF8B4D2D))
+    }
+    val gateTopMaterial = remember(engine) {
+        materialLoader.createColorInstance(Color(0xFFB98A42))
+    }
+    val monkMaterial = remember(engine) {
+        materialLoader.createColorInstance(Color(0xFFE0A13D))
+    }
+    val headMaterial = remember(engine) {
+        materialLoader.createColorInstance(Color(0xFFE7B98B))
+    }
 
+    // SÂN CHÙA
     val floor = rememberNode(engine) {
         CubeNode(
             engine = engine,
             size = Size(7f, 0.2f, 7f),
-            materialInstance = rememberColorMaterial(engine, Color(0xFF78916A))
+            materialInstance = floorMaterial
         ).apply {
             position = Position(y = -0.5f)
         }
     }
 
+    // THÂN CHÙA
     val templeBase = rememberNode(engine) {
         CubeNode(
             engine = engine,
             size = Size(2.8f, 1.5f, 1.8f),
-            materialInstance = rememberColorMaterial(engine, Color(0xFFB77A42))
+            materialInstance = templeMaterial
         ).apply {
             position = Position(y = 0.25f, z = -1.4f)
         }
     }
 
+    // MÁI CHÙA
     val templeRoof = rememberNode(engine) {
         CubeNode(
             engine = engine,
             size = Size(3.5f, 0.25f, 2.4f),
-            materialInstance = rememberColorMaterial(engine, Color(0xFF713B28))
+            materialInstance = roofMaterial
         ).apply {
             position = Position(y = 1.15f, z = -1.4f)
         }
     }
 
+    // CỔNG CHÙA
     val gateLeft = rememberNode(engine) {
         CubeNode(
             engine = engine,
             size = Size(0.25f, 2f, 0.25f),
-            materialInstance = rememberColorMaterial(engine, Color(0xFF8B4D2D))
+            materialInstance = gateMaterial
         ).apply {
             position = Position(x = -1.8f, y = 0.5f, z = 1.5f)
         }
@@ -109,7 +118,7 @@ val headMaterial = remember(engine) {
         CubeNode(
             engine = engine,
             size = Size(0.25f, 2f, 0.25f),
-            materialInstance = rememberColorMaterial(engine, Color(0xFF8B4D2D))
+            materialInstance = gateMaterial
         ).apply {
             position = Position(x = 1.8f, y = 0.5f, z = 1.5f)
         }
@@ -119,17 +128,18 @@ val headMaterial = remember(engine) {
         CubeNode(
             engine = engine,
             size = Size(4.1f, 0.25f, 0.35f),
-            materialInstance = rememberColorMaterial(engine, Color(0xFFB98A42))
+            materialInstance = gateTopMaterial
         ).apply {
             position = Position(y = 1.55f, z = 1.5f)
         }
     }
 
+    // NHÂN VẬT SƯ THẦY
     val monkBody = rememberNode(engine) {
         CubeNode(
             engine = engine,
             size = Size(0.65f, 1.1f, 0.45f),
-            materialInstance = rememberColorMaterial(engine, Color(0xFFE0A13D))
+            materialInstance = monkMaterial
         ).apply {
             position = Position(y = 0.15f, z = 0.5f)
         }
@@ -139,12 +149,13 @@ val headMaterial = remember(engine) {
         SphereNode(
             engine = engine,
             radius = 0.32f,
-            materialInstance = rememberColorMaterial(engine, Color(0xFFE7B98B))
+            materialInstance = headMaterial
         ).apply {
             position = Position(y = 0.95f, z = 0.5f)
         }
     }
 
+    // CAMERA 3D
     val cameraNode = rememberCameraNode(engine) {
         position = Position(y = 3.0f, z = 9.0f)
         lookAt(Position(y = 0.3f, z = 0f))
@@ -162,14 +173,14 @@ val headMaterial = remember(engine) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "SƯ THẦY QUÉT LÁ",
+                    text = "SƯ THẦY QUÉT LÁ",
                     color = Color(0xFFFFD76A),
                     fontSize = 25.sp,
                     fontWeight = FontWeight.Bold
                 )
 
                 Text(
-                    "LIVE 3D INTERACTIVE",
+                    text = "LIVE 3D INTERACTIVE",
                     color = Color.White,
                     fontSize = 13.sp
                 )
@@ -202,7 +213,7 @@ val headMaterial = remember(engine) {
                     )
 
                     Text(
-                        "SÂN CHÙA 3D • DEMO",
+                        text = "SÂN CHÙA 3D • DEMO",
                         modifier = Modifier
                             .align(Alignment.TopCenter)
                             .padding(12.dp)
@@ -219,7 +230,7 @@ val headMaterial = remember(engine) {
                 Spacer(Modifier.height(10.dp))
 
                 Text(
-                    message,
+                    text = message,
                     color = Color.White,
                     fontSize = 14.sp
                 )
@@ -237,7 +248,14 @@ val headMaterial = remember(engine) {
                 Spacer(Modifier.height(8.dp))
 
                 Button(
-                    onClick = { isLive = !isLive },
+                    onClick = {
+                        isLive = !isLive
+                        message = if (isLive) {
+                            "Đã bắt đầu phiên DEMO LIVE!"
+                        } else {
+                            "Đã dừng phiên DEMO LIVE!"
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
@@ -246,42 +264,39 @@ val headMaterial = remember(engine) {
                     )
                 }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = {
-                        likes++
-                        message = "Cảm ơn bạn đã thả tim!"
-                    }) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Button(
+                        onClick = {
+                            likes++
+                            message = "Cảm ơn bạn đã thả tim!"
+                        }
+                    ) {
                         Text("❤️ Thả tim")
                     }
 
-                    Button(onClick = {
-                        gifts++
-                        message = "Cảm ơn món quà của bạn!"
-                    }) {
+                    Button(
+                        onClick = {
+                            gifts++
+                            message = "Cảm ơn món quà của bạn!"
+                        }
+                    ) {
                         Text("🎁 Tặng quà")
                     }
 
-                    OutlinedButton(onClick = {
-                        likes = 0
-                        gifts = 0
-                        message = "Đã đặt lại dữ liệu DEMO"
-                    }) {
+                    OutlinedButton(
+                        onClick = {
+                            likes = 0
+                            gifts = 0
+                            message = "Đã đặt lại dữ liệu DEMO"
+                        }
+                    ) {
                         Text("Đặt lại")
                     }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun rememberColorMaterial(
-    engine: com.google.android.filament.Engine,
-    color: Color
-): com.google.android.filament.MaterialInstance {
-    val materialLoader = io.github.sceneview.rememberMaterialLoader(engine)
-    return remember(color) {
-        materialLoader.createColorInstance(color)
     }
 }
 
@@ -297,8 +312,9 @@ fun StatCard(title: String, value: Int) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(title, color = Color.White)
+
             Text(
-                value.toString(),
+                text = value.toString(),
                 color = Color(0xFFFFD76A),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
