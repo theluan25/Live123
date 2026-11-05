@@ -126,7 +126,7 @@ fun LiveApp() {
                             x = original.x +
                                 if (isSweepingPart && progress >= 1f) swing else 0f,
                             y = original.y,
-                            z = original.z - travelOffset
+                          z = original.z - monk.startOffset * progress
                         )
                     }
                 }
