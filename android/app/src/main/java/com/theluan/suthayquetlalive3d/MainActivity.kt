@@ -41,6 +41,29 @@ fun LiveApp() {
     var message by remember { mutableStateOf("Chào mừng đến với sân chùa!") }
 
     val engine = rememberEngine()
+val materialLoader = io.github.sceneview.rememberMaterialLoader(engine)
+
+val floorMaterial = remember(engine) {
+    materialLoader.createColorInstance(Color(0xFF78916A))
+}
+val templeMaterial = remember(engine) {
+    materialLoader.createColorInstance(Color(0xFFB77A42))
+}
+val roofMaterial = remember(engine) {
+    materialLoader.createColorInstance(Color(0xFF713B28))
+}
+val gateMaterial = remember(engine) {
+    materialLoader.createColorInstance(Color(0xFF8B4D2D))
+}
+val gateTopMaterial = remember(engine) {
+    materialLoader.createColorInstance(Color(0xFFB98A42))
+}
+val monkMaterial = remember(engine) {
+    materialLoader.createColorInstance(Color(0xFFE0A13D))
+}
+val headMaterial = remember(engine) {
+    materialLoader.createColorInstance(Color(0xFFE7B98B))
+}
 
     val floor = rememberNode(engine) {
         CubeNode(
