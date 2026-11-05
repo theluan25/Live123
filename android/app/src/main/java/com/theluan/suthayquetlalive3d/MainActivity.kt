@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.runtime.withFrameNanos
 import io.github.sceneview.Scene
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Size
@@ -28,6 +27,8 @@ import io.github.sceneview.rememberNode
 import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberMainLightNode
 import kotlin.math.sin
+import kotlin.math.cos
+import kotlin.math.abs
 
 private data class MonkActor(
     val id: Long,
@@ -37,6 +38,8 @@ private data class MonkActor(
     val head: SphereNode,
     val movingParts: List<GeometryNode>,
     val originalPositions: List<Position>,
+    val leaves: List<GeometryNode>,
+    val leafPositions: List<Position>,
     val startOffset: Float,
     val createdAtMillis: Long
 )
@@ -93,25 +96,30 @@ fun LiveApp() {
     val strawMaterial = remember(engine) {
         materialLoader.createColorInstance(Color(0xFFD7B45B))
     }
+    val leafMaterial = remember(engine) {
+        materialLoader.createColorInstance(Color(0xFFB87932))
+    }
 
-    // Chuyển động đi vào sân và quét chổi
+    // Hoạt ảnh đi vào sân, quét chổi và lá bay
     LaunchedEffect(Unit) {
         while (true) {
-            withFrameNanos {
+            androidx.compose.runtime.withFrameNanos { frameTime ->
                 val now = System.currentTimeMillis()
 
                 monks.forEach { monk ->
-                    val progress = (
-                        (now - monk.createdAtMillis) / 2500f
-                    ).coerceIn(0f, 1f)
+                    val elapsed = now - monk.createdAtMillis
+
+                    val progress = (elapsed / 2500f)
+                        .coerceIn(0f, 1f)
 
                     val travelOffset =
                         monk.startOffset * (1f - progress)
 
-                    val seconds = now / 1000.0
+                    val seconds = frameTime / 1_000_000_000.0
+
                     val swing = sin(
                         seconds * 5.0 + monk.id
-                    ).toFloat() * 0.12f
+                    ).toFloat() * 0.15f
 
                     val allNodes = monk.parts + monk.head
 
@@ -126,8 +134,44 @@ fun LiveApp() {
                             x = original.x +
                                 if (isSweepingPart && progress >= 1f) swing else 0f,
                             y = original.y,
-                          z = original.z - monk.startOffset * progress
+                            z = original.z - travelOffset
                         )
+                    }
+
+                    // Lá bắt đầu bay khi sư thầy đã vào sân
+                    val sweepTime = (
+                        (elapsed - 2500L).coerceAtLeast(0L) / 1000f
+                    )
+
+                    monk.leaves.forEachIndexed { index, leaf ->
+                        val original = monk.leafPositions[index]
+
+                        if (progress < 1f) {
+                            leaf.position = Position(
+                                x = original.x,
+                                y = original.y,
+                                z = original.z - travelOffset
+                            )
+                        } else {
+                            val phase = (
+                                sweepTime * 4.0 +
+                                index * 1.4 +
+                                monk.id
+                            )
+
+                            val spread = (
+                                0.06f + sweepTime.coerceAtMost(3f) * 0.08f
+                            ).coerceAtMost(0.32f)
+
+                            leaf.position = Position(
+                                x = original.x +
+                                    sin(phase).toFloat() * spread,
+                                y = original.y +
+                                    abs(sin(phase * 1.7)).toFloat() * 0.08f,
+                                z = original.z +
+                                    cos(phase).toFloat() * spread
+                            )
+                        }
                     }
                 }
             }
@@ -246,7 +290,7 @@ fun LiveApp() {
                             gateRight,
                             gateTop
                         ) + monks.flatMap {
-                            it.parts + it.head
+                            it.parts + it.head + it.leaves
                         }
                     )
 
@@ -351,7 +395,6 @@ fun LiveApp() {
                         val x = (lane - 2) * 0.72f
                         val z = 0.35f + row * 0.65f
 
-                        // Nhân vật bắt đầu ở phía cổng
                         val startOffset = 2.5f
                         val startZ = z + startOffset
 
@@ -503,9 +546,31 @@ fun LiveApp() {
                             broomHead
                         )
 
+                        // Tạo 5 chiếc lá khô quanh đầu chổi
+                        val leaves: List<GeometryNode> = (0 until 5).map { i ->
+                            CubeNode(
+                                engine,
+                                size = Size(
+                                    0.12f + (i % 2) * 0.03f,
+                                    0.025f,
+                                    0.075f
+                                ),
+                                materialInstance = leafMaterial
+                            ).apply {
+                                position = Position(
+                                    x = x + 0.55f + (i - 2) * 0.12f,
+                                    y = -0.43f,
+                                    z = startZ + 0.12f + (i % 2) * 0.10f
+                                )
+                            }
+                        }
+
                         val allNodes = parts + head
                         val originalPositions =
                             allNodes.map { it.position }
+
+                        val leafPositions =
+                            leaves.map { it.position }
 
                         monks.add(
                             MonkActor(
@@ -516,6 +581,8 @@ fun LiveApp() {
                                 head = head,
                                 movingParts = movingParts,
                                 originalPositions = originalPositions,
+                                leaves = leaves,
+                                leafPositions = leafPositions,
                                 startOffset = startOffset,
                                 createdAtMillis = System.currentTimeMillis()
                             )
