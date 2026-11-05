@@ -25,6 +25,7 @@ import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberNode
 import io.github.sceneview.rememberMaterialLoader
+import io.github.sceneview.rememberMainLightNode
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +48,6 @@ fun LiveApp() {
     val engine = rememberEngine()
     val materialLoader = rememberMaterialLoader(engine)
 
-    // VẬT LIỆU 3D
     val floorMaterial = remember(engine) {
         materialLoader.createColorInstance(Color(0xFF78916A))
     }
@@ -70,8 +70,8 @@ fun LiveApp() {
         materialLoader.createColorInstance(Color(0xFFE7B98B))
     }
 
-    // SÂN CHÙA
-    val floor = rememberNode(engine) {
+    // SAN CHUA
+    val floor = rememberNode {
         CubeNode(
             engine = engine,
             size = Size(7f, 0.2f, 7f),
@@ -81,8 +81,8 @@ fun LiveApp() {
         }
     }
 
-    // THÂN CHÙA
-    val templeBase = rememberNode(engine) {
+    // THAN CHUA
+    val templeBase = rememberNode {
         CubeNode(
             engine = engine,
             size = Size(2.8f, 1.5f, 1.8f),
@@ -92,8 +92,8 @@ fun LiveApp() {
         }
     }
 
-    // MÁI CHÙA
-    val templeRoof = rememberNode(engine) {
+    // MAI CHUA
+    val templeRoof = rememberNode {
         CubeNode(
             engine = engine,
             size = Size(3.5f, 0.25f, 2.4f),
@@ -103,8 +103,8 @@ fun LiveApp() {
         }
     }
 
-    // CỔNG CHÙA
-    val gateLeft = rememberNode(engine) {
+    // CONG CHUA
+    val gateLeft = rememberNode {
         CubeNode(
             engine = engine,
             size = Size(0.25f, 2f, 0.25f),
@@ -114,7 +114,7 @@ fun LiveApp() {
         }
     }
 
-    val gateRight = rememberNode(engine) {
+    val gateRight = rememberNode {
         CubeNode(
             engine = engine,
             size = Size(0.25f, 2f, 0.25f),
@@ -124,7 +124,7 @@ fun LiveApp() {
         }
     }
 
-    val gateTop = rememberNode(engine) {
+    val gateTop = rememberNode {
         CubeNode(
             engine = engine,
             size = Size(4.1f, 0.25f, 0.35f),
@@ -134,8 +134,8 @@ fun LiveApp() {
         }
     }
 
-    // NHÂN VẬT SƯ THẦY
-    val monkBody = rememberNode(engine) {
+    // NHAN VAT SU THAY
+    val monkBody = rememberNode {
         CubeNode(
             engine = engine,
             size = Size(0.65f, 1.1f, 0.45f),
@@ -145,7 +145,7 @@ fun LiveApp() {
         }
     }
 
-    val monkHead = rememberNode(engine) {
+    val monkHead = rememberNode {
         SphereNode(
             engine = engine,
             radius = 0.32f,
@@ -155,9 +155,9 @@ fun LiveApp() {
         }
     }
 
-    // CAMERA 3D
+    // CAMERA
     val cameraNode = rememberCameraNode(engine) {
-        position = Position(y = 3.0f, z = 9.0f)
+        position = Position(y = 3f, z = 9f)
         lookAt(Position(y = 0.3f, z = 0f))
     }
 
@@ -199,10 +199,9 @@ fun LiveApp() {
                     Scene(
                         modifier = Modifier.fillMaxSize(),
                         engine = engine,
-                        mainLightNode = io.github.sceneview.rememberMainLightNode(engine) 
-                 {
-    intensity = 100_000.0f
-},
+                        mainLightNode = rememberMainLightNode(engine) {
+                            intensity = 100000f
+                        },
                         cameraNode = cameraNode,
                         childNodes = listOf(
                             floor,
