@@ -62,32 +62,56 @@ fun LiveApp() {
     val skinMaterial = remember(engine) { materialLoader.createColorInstance(Color(0xFFE7B98B)) }
 
     val floor = rememberNode {
-        CubeNode(engine, Size(7f, 0.2f, 7f), floorMaterial).apply {
+        CubeNode(
+    engine,
+    size = Size(7f, 0.2f, 7f),
+    materialInstance = floorMaterial
+).apply {
             position = Position(y = -0.5f)
         }
     }
     val templeBase = rememberNode {
-        CubeNode(engine, Size(2.8f, 1.5f, 1.8f), templeMaterial).apply {
+        CubeNode(
+    engine,
+    size = Size(2.8f, 1.5f, 1.8f),
+    materialInstance = templeMaterial
+).apply {
             position = Position(y = 0.25f, z = -1.4f)
         }
     }
     val templeRoof = rememberNode {
-        CubeNode(engine, Size(3.5f, 0.25f, 2.4f), roofMaterial).apply {
+        CubeNode(
+    engine,
+    size = Size(3.5f, 0.25f, 2.4f),
+    materialInstance = roofMaterial
+).apply {
             position = Position(y = 1.15f, z = -1.4f)
         }
     }
     val gateLeft = rememberNode {
-        CubeNode(engine, Size(0.25f, 2f, 0.25f), gateMaterial).apply {
+        CubeNode(
+    engine,
+    size = Size(0.25f, 2f, 0.25f),
+    materialInstance = gateMaterial
+).apply {
             position = Position(x = -1.8f, y = 0.5f, z = 1.5f)
         }
     }
     val gateRight = rememberNode {
-        CubeNode(engine, Size(0.25f, 2f, 0.25f), gateMaterial).apply {
+        CubeNode(
+    engine,
+    size = Size(0.25f, 2f, 0.25f),
+    materialInstance = gateMaterial
+).apply {
             position = Position(x = 1.8f, y = 0.5f, z = 1.5f)
         }
     }
     val gateTop = rememberNode {
-        CubeNode(engine, Size(4.1f, 0.25f, 0.35f), goldMaterial).apply {
+        CubeNode(
+    engine,
+    size = Size(4.1f, 0.25f, 0.35f),
+    materialInstance = goldMaterial
+).apply {
             position = Position(y = 1.55f, z = 1.5f)
         }
     }
@@ -168,10 +192,18 @@ fun LiveApp() {
                         val row = ((nextId - 1L) / 5L).toInt()
                         val x = (lane - 2) * 0.72f
                         val z = 0.35f + row * 0.65f
-                        val body = CubeNode(engine, Size(0.48f, 0.85f, 0.38f), robeMaterial).apply {
+                        val body = CubeNode(
+    engine,
+    size = Size(0.48f, 0.85f, 0.38f),
+    materialInstance = robeMaterial
+).apply {
                             position = Position(x = x, y = 0f, z = z)
                         }
-                        val head = SphereNode(engine, 0.24f, skinMaterial).apply {
+                        val head = SphereNode(
+    engine,
+    radius = 0.24f,
+    materialInstance = skinMaterial
+).apply {
                             position = Position(x = x, y = 0.62f, z = z)
                         }
                         monks.add(MonkActor(nextId, name, comment, body, head))
