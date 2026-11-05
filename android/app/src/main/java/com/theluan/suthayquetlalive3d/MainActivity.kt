@@ -20,6 +20,7 @@ import io.github.sceneview.math.Position
 import io.github.sceneview.math.Size
 import io.github.sceneview.node.CubeNode
 import io.github.sceneview.node.SphereNode
+import io.github.sceneview.node.GeometryNode
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberNode
@@ -30,7 +31,7 @@ private data class MonkActor(
     val id: Long,
     val name: String,
     val comment: String,
-    val parts: List<CubeNode>,
+    val parts: List<GeometryNode>,
     val head: SphereNode
 )
 
@@ -197,7 +198,9 @@ fun LiveApp() {
                             gateLeft,
                             gateRight,
                             gateTop
-                        ) + monks.flatMap { it.parts + it.head }
+                        ) + monks.flatMap {
+                            it.parts + it.head
+                        }
                     )
 
                     Text(
@@ -216,6 +219,7 @@ fun LiveApp() {
                     monks.forEach { monk ->
                         val lane = ((monk.id - 1L) % 5L).toInt()
                         val row = ((monk.id - 1L) / 5L).toInt()
+
                         val horizontalPosition = (lane - 2) * 0.12f
                         val verticalPosition =
                             (0.58f + row * 0.07f).coerceAtMost(0.88f)
@@ -232,7 +236,10 @@ fun LiveApp() {
                                     Color(0xDD17251D),
                                     RoundedCornerShape(8.dp)
                                 )
-                                .padding(horizontal = 7.dp, vertical = 4.dp),
+                                .padding(
+                                    horizontal = 7.dp,
+                                    vertical = 4.dp
+                                ),
                             color = Color(0xFFFFD76A),
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
@@ -287,6 +294,7 @@ fun LiveApp() {
                     onClick = {
                         val name = username.trim()
                             .ifBlank { "Khách $nextId" }
+
                         val comment = commentText.trim()
                             .ifBlank { "Nam mô A Di Đà Phật" }
 
@@ -308,7 +316,11 @@ fun LiveApp() {
                             size = Size(0.50f, 0.25f, 0.40f),
                             materialInstance = robeDarkMaterial
                         ).apply {
-                            position = Position(x = x, y = -0.25f, z = z + 0.02f)
+                            position = Position(
+                                x = x,
+                                y = -0.25f,
+                                z = z + 0.02f
+                            )
                         }
 
                         val head = SphereNode(
@@ -324,7 +336,11 @@ fun LiveApp() {
                             size = Size(0.18f, 0.62f, 0.20f),
                             materialInstance = robeMaterial
                         ).apply {
-                            position = Position(x = x - 0.32f, y = 0.05f, z = z)
+                            position = Position(
+                                x = x - 0.32f,
+                                y = 0.05f,
+                                z = z
+                            )
                         }
 
                         val rightArm = CubeNode(
@@ -332,7 +348,11 @@ fun LiveApp() {
                             size = Size(0.18f, 0.62f, 0.20f),
                             materialInstance = robeMaterial
                         ).apply {
-                            position = Position(x = x + 0.32f, y = 0.05f, z = z)
+                            position = Position(
+                                x = x + 0.32f,
+                                y = 0.05f,
+                                z = z
+                            )
                         }
 
                         val leftHand = SphereNode(
@@ -340,7 +360,11 @@ fun LiveApp() {
                             radius = 0.10f,
                             materialInstance = skinMaterial
                         ).apply {
-                            position = Position(x = x - 0.32f, y = -0.28f, z = z)
+                            position = Position(
+                                x = x - 0.32f,
+                                y = -0.28f,
+                                z = z
+                            )
                         }
 
                         val rightHand = SphereNode(
@@ -348,7 +372,11 @@ fun LiveApp() {
                             radius = 0.10f,
                             materialInstance = skinMaterial
                         ).apply {
-                            position = Position(x = x + 0.32f, y = -0.28f, z = z)
+                            position = Position(
+                                x = x + 0.32f,
+                                y = -0.28f,
+                                z = z
+                            )
                         }
 
                         val leftLeg = CubeNode(
@@ -356,7 +384,11 @@ fun LiveApp() {
                             size = Size(0.18f, 0.38f, 0.20f),
                             materialInstance = robeDarkMaterial
                         ).apply {
-                            position = Position(x = x - 0.13f, y = -0.55f, z = z)
+                            position = Position(
+                                x = x - 0.13f,
+                                y = -0.55f,
+                                z = z
+                            )
                         }
 
                         val rightLeg = CubeNode(
@@ -364,7 +396,11 @@ fun LiveApp() {
                             size = Size(0.18f, 0.38f, 0.20f),
                             materialInstance = robeDarkMaterial
                         ).apply {
-                            position = Position(x = x + 0.13f, y = -0.55f, z = z)
+                            position = Position(
+                                x = x + 0.13f,
+                                y = -0.55f,
+                                z = z
+                            )
                         }
 
                         val broomHandle = CubeNode(
@@ -372,7 +408,11 @@ fun LiveApp() {
                             size = Size(0.07f, 1.05f, 0.07f),
                             materialInstance = broomMaterial
                         ).apply {
-                            position = Position(x = x + 0.58f, y = -0.05f, z = z + 0.05f)
+                            position = Position(
+                                x = x + 0.58f,
+                                y = -0.05f,
+                                z = z + 0.05f
+                            )
                         }
 
                         val broomHead = CubeNode(
@@ -380,10 +420,14 @@ fun LiveApp() {
                             size = Size(0.42f, 0.18f, 0.20f),
                             materialInstance = strawMaterial
                         ).apply {
-                            position = Position(x = x + 0.58f, y = -0.58f, z = z + 0.05f)
+                            position = Position(
+                                x = x + 0.58f,
+                                y = -0.58f,
+                                z = z + 0.05f
+                            )
                         }
 
-                        val parts = listOf(
+                        val parts: List<GeometryNode> = listOf(
                             body,
                             robeFront,
                             leftArm,
@@ -406,7 +450,9 @@ fun LiveApp() {
                             )
                         )
 
-                        message = "$name: $comment • Đã tạo sư thầy #$nextId"
+                        message =
+                            "$name: $comment • Đã tạo sư thầy #$nextId"
+
                         nextId++
                         commentText = ""
                     },
@@ -445,7 +491,9 @@ fun LiveApp() {
                     )
                 }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Button(
                         onClick = {
                             likes++
