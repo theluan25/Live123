@@ -113,7 +113,7 @@ fun LiveApp() {
                         .coerceIn(0f, 1f)
 
                     val travelOffset =
-                        monk.startOffset * (1f - progress)
+                        monk.startOffset * progress
 
                     val seconds = frameTime / 1_000_000_000.0
 
@@ -168,8 +168,8 @@ fun LiveApp() {
                                     sin(phase).toFloat() * spread,
                                 y = original.y +
                                     abs(sin(phase * 1.7)).toFloat() * 0.08f,
-                                z = original.z +
-                                    cos(phase).toFloat() * spread
+                                z = original.z - monk.startOffset +
+    cos(phase).toFloat() * spread
                             )
                         }
                     }
