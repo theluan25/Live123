@@ -18,7 +18,7 @@ android {
 
     buildTypes {
         getByName("debug") {
-            applicationIdSuffix = ".3d"
+            applicationIdSuffix = ".live3d"
         }
     }
 
