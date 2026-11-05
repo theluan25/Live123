@@ -1,0 +1,8 @@
+package com.theluan.suthayquetlalive3d
+
+data class MonkCharacter(
+    val id: Long,
+    val username: String,
+    val lane: Int,
+    val isSweeping: Boolean = false
+)
