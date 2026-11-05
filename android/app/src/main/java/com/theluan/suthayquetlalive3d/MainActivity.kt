@@ -21,6 +21,9 @@ import io.github.sceneview.math.Size
 import io.github.sceneview.node.CubeNode
 import io.github.sceneview.node.SphereNode
 import io.github.sceneview.node.GeometryNode
+import kotlin.math.sin
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.withFrameNanos
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberNode
@@ -32,7 +35,9 @@ private data class MonkActor(
     val name: String,
     val comment: String,
     val parts: List<GeometryNode>,
-    val head: SphereNode
+    val head: SphereNode,
+    val movingParts: List<GeometryNode>,
+    val originalPositions: List<Position>
 )
 
 class MainActivity : ComponentActivity() {
@@ -52,6 +57,31 @@ fun LiveApp() {
     var message by remember { mutableStateOf("Chào mừng đến với sân chùa!") }
     var nextId by remember { mutableLongStateOf(1L) }
     val monks = remember { mutableStateListOf<MonkActor>() }
+    LaunchedEffect(Unit) {
+    var startTime = 0L
+
+    while (true) {
+        withFrameNanos { frameTime ->
+            if (startTime == 0L) startTime = frameTime
+
+            val seconds = (frameTime - startTime) / 1_000_000_000.0
+
+            monks.forEach { monk ->
+                val swing = sin(seconds * 5.0 + monk.id).toFloat() * 0.12f
+
+                monk.movingParts.forEachIndexed { index, part ->
+                    val original = monk.originalPositions[index]
+
+                    part.position = Position(
+                        x = original.x + swing,
+                        y = original.y,
+                        z = original.z
+                    )
+                }
+            }
+        }
+    }
+}
 
     val engine = rememberEngine()
     val materialLoader = rememberMaterialLoader(engine)
@@ -439,15 +469,25 @@ fun LiveApp() {
                             broomHandle,
                             broomHead
                         )
+                        val movingParts = listOf(
+    rightArm,
+    rightHand,
+    broomHandle,
+    broomHead
+)
+
+val originalPositions = movingParts.map { it.position }
 
                         monks.add(
                             MonkActor(
-                                nextId,
-                                name,
-                                comment,
-                                parts,
-                                head
-                            )
+    nextId,
+    name,
+    comment,
+    parts,
+    head,
+    movingParts,
+    originalPositions
+)
                         )
 
                         message =
