@@ -15,20 +15,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.withFrameNanos
 import io.github.sceneview.Scene
 import io.github.sceneview.math.Position
 import io.github.sceneview.math.Size
 import io.github.sceneview.node.CubeNode
 import io.github.sceneview.node.SphereNode
 import io.github.sceneview.node.GeometryNode
-import kotlin.math.sin
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.withFrameNanos
 import io.github.sceneview.rememberCameraNode
 import io.github.sceneview.rememberEngine
 import io.github.sceneview.rememberNode
 import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberMainLightNode
+import kotlin.math.sin
 
 private data class MonkActor(
     val id: Long,
@@ -37,7 +36,9 @@ private data class MonkActor(
     val parts: List<GeometryNode>,
     val head: SphereNode,
     val movingParts: List<GeometryNode>,
-    val originalPositions: List<Position>
+    val originalPositions: List<Position>,
+    val startOffset: Float,
+    val createdAtMillis: Long
 )
 
 class MainActivity : ComponentActivity() {
@@ -56,32 +57,8 @@ fun LiveApp() {
     var commentText by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("Chào mừng đến với sân chùa!") }
     var nextId by remember { mutableLongStateOf(1L) }
+
     val monks = remember { mutableStateListOf<MonkActor>() }
-    LaunchedEffect(Unit) {
-    var startTime = 0L
-
-    while (true) {
-        withFrameNanos { frameTime ->
-            if (startTime == 0L) startTime = frameTime
-
-            val seconds = (frameTime - startTime) / 1_000_000_000.0
-
-            monks.forEach { monk ->
-                val swing = sin(seconds * 5.0 + monk.id).toFloat() * 0.12f
-
-                monk.movingParts.forEachIndexed { index, part ->
-                    val original = monk.originalPositions[index]
-
-                    part.position = Position(
-                        x = original.x + swing,
-                        y = original.y,
-                        z = original.z
-                    )
-                }
-            }
-        }
-    }
-}
 
     val engine = rememberEngine()
     val materialLoader = rememberMaterialLoader(engine)
@@ -115,6 +92,46 @@ fun LiveApp() {
     }
     val strawMaterial = remember(engine) {
         materialLoader.createColorInstance(Color(0xFFD7B45B))
+    }
+
+    // Chuyển động đi vào sân và quét chổi
+    LaunchedEffect(Unit) {
+        while (true) {
+            withFrameNanos {
+                val now = System.currentTimeMillis()
+
+                monks.forEach { monk ->
+                    val progress = (
+                        (now - monk.createdAtMillis) / 2500f
+                    ).coerceIn(0f, 1f)
+
+                    val travelOffset =
+                        monk.startOffset * (1f - progress)
+
+                    val seconds = now / 1000.0
+                    val swing = sin(
+                        seconds * 5.0 + monk.id
+                    ).toFloat() * 0.12f
+
+                    val allNodes = monk.parts + monk.head
+
+                    allNodes.forEachIndexed { index, node ->
+                        val original = monk.originalPositions[index]
+
+                        val isSweepingPart = monk.movingParts.any {
+                            it === node
+                        }
+
+                        node.position = Position(
+                            x = original.x +
+                                if (isSweepingPart && progress >= 1f) swing else 0f,
+                            y = original.y,
+                            z = original.z - travelOffset
+                        )
+                    }
+                }
+            }
+        }
     }
 
     val floor = rememberNode {
@@ -330,15 +347,20 @@ fun LiveApp() {
 
                         val lane = ((nextId - 1L) % 5L).toInt()
                         val row = ((nextId - 1L) / 5L).toInt()
+
                         val x = (lane - 2) * 0.72f
                         val z = 0.35f + row * 0.65f
+
+                        // Nhân vật bắt đầu ở phía cổng
+                        val startOffset = 2.5f
+                        val startZ = z + startOffset
 
                         val body = CubeNode(
                             engine,
                             size = Size(0.48f, 0.85f, 0.38f),
                             materialInstance = robeMaterial
                         ).apply {
-                            position = Position(x = x, y = 0f, z = z)
+                            position = Position(x = x, y = 0f, z = startZ)
                         }
 
                         val robeFront = CubeNode(
@@ -349,7 +371,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x,
                                 y = -0.25f,
-                                z = z + 0.02f
+                                z = startZ + 0.02f
                             )
                         }
 
@@ -358,7 +380,11 @@ fun LiveApp() {
                             radius = 0.24f,
                             materialInstance = skinMaterial
                         ).apply {
-                            position = Position(x = x, y = 0.62f, z = z)
+                            position = Position(
+                                x = x,
+                                y = 0.62f,
+                                z = startZ
+                            )
                         }
 
                         val leftArm = CubeNode(
@@ -369,7 +395,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x - 0.32f,
                                 y = 0.05f,
-                                z = z
+                                z = startZ
                             )
                         }
 
@@ -381,7 +407,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x + 0.32f,
                                 y = 0.05f,
-                                z = z
+                                z = startZ
                             )
                         }
 
@@ -393,7 +419,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x - 0.32f,
                                 y = -0.28f,
-                                z = z
+                                z = startZ
                             )
                         }
 
@@ -405,7 +431,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x + 0.32f,
                                 y = -0.28f,
-                                z = z
+                                z = startZ
                             )
                         }
 
@@ -417,7 +443,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x - 0.13f,
                                 y = -0.55f,
-                                z = z
+                                z = startZ
                             )
                         }
 
@@ -429,7 +455,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x + 0.13f,
                                 y = -0.55f,
-                                z = z
+                                z = startZ
                             )
                         }
 
@@ -441,7 +467,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x + 0.58f,
                                 y = -0.05f,
-                                z = z + 0.05f
+                                z = startZ + 0.05f
                             )
                         }
 
@@ -453,7 +479,7 @@ fun LiveApp() {
                             position = Position(
                                 x = x + 0.58f,
                                 y = -0.58f,
-                                z = z + 0.05f
+                                z = startZ + 0.05f
                             )
                         }
 
@@ -469,25 +495,30 @@ fun LiveApp() {
                             broomHandle,
                             broomHead
                         )
-                        val movingParts = listOf(
-    rightArm,
-    rightHand,
-    broomHandle,
-    broomHead
-)
 
-val originalPositions = movingParts.map { it.position }
+                        val movingParts: List<GeometryNode> = listOf(
+                            rightArm,
+                            rightHand,
+                            broomHandle,
+                            broomHead
+                        )
+
+                        val allNodes = parts + head
+                        val originalPositions =
+                            allNodes.map { it.position }
 
                         monks.add(
                             MonkActor(
-    nextId,
-    name,
-    comment,
-    parts,
-    head,
-    movingParts,
-    originalPositions
-)
+                                id = nextId,
+                                name = name,
+                                comment = comment,
+                                parts = parts,
+                                head = head,
+                                movingParts = movingParts,
+                                originalPositions = originalPositions,
+                                startOffset = startOffset,
+                                createdAtMillis = System.currentTimeMillis()
+                            )
                         )
 
                         message =
