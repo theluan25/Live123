@@ -199,6 +199,10 @@ fun LiveApp() {
                     Scene(
                         modifier = Modifier.fillMaxSize(),
                         engine = engine,
+                        mainLightNode = io.github.sceneview.rememberMainLightNode(engine) 
+                 {
+    intensity = 100_000.0f
+},
                         cameraNode = cameraNode,
                         childNodes = listOf(
                             floor,
